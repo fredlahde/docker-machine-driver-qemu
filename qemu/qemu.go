@@ -294,7 +294,10 @@ func (d *Driver) GetState() (state.State, error) {
 	}
 	if err := checkPid(pid); err != nil {
 		// No pid, remove pidfile
-		os.Remove(d.pidfilePath())
+		err = os.Remove(d.pidfilePath())
+		if err != nil {
+			log.Warn("Error while removing pid file", err)
+		}
 		return state.Stopped, nil
 	}
 	ret, err := d.RunQMPCommand("query-status")
@@ -522,6 +525,8 @@ func (d *Driver) Start() error {
 		// last argument is always the name of the disk image
 		startCmd = append(startCmd, d.diskPath())
 	}
+
+	log.Debug("start cmd:", startCmd)
 
 	if stdout, stderr, err := cmdOutErr(d.Program, startCmd...); err != nil {
 		fmt.Printf("OUTPUT: %s\n", stdout)
