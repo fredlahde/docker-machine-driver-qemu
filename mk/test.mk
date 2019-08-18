@@ -9,3 +9,7 @@ test-long:
 test-integration: build
 	$(eval TESTSUITE=$(filter-out $@,$(MAKECMDGOALS)))
 	test/integration/run-bats.sh $(TESTSUITE)
+
+test-docker:
+	docker-machine rm -f qemu-test
+	docker-machine -D create --driver=qemu qemu-test
